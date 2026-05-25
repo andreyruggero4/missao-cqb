@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missão CQB: O Resgate Espacial</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap');
+
+  body {
+    background-color: #0b0c10;
+    color: #c5c6c7;
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: radial-gradient(circle, #1f2833 10%, transparent 10%), radial-gradient(circle, #1f2833 10%, transparent 10%);
+    background-size: 50px 50px;
+    background-position: 0 0, 25px 25px;
+  }
+
+  .game-container {
+    background-color: #1f2833;
+    border: 4px solid #66fcf1;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 20px #45a29e;
+  }
+
+  h1 {
+    font-family: 'Press Start 2P', cursive;
+    color: #66fcf1;
+    font-size: 1.2em;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .story-text {
+    font-size: 1.2em;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    min-height: 100px;
+  }
+
+  .emoji-display {
+    font-size: 4em;
+    margin: 10px 0;
+  }
+
+  .input-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  input[type="number"] {
+    font-size: 1.5em;
+    padding: 10px;
+    width: 150px;
+    text-align: center;
+    border: 2px solid #45a29e;
+    border-radius: 8px;
+    background-color: #0b0c10;
+    color: #66fcf1;
+    font-weight: bold;
+    outline: none;
+  }
+
+  /* Remove as setinhas chatas do input number */
+  input[type="number"]::-webkit-inner-spin-button, 
+  input[type="number"]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+
+  .btn {
+    background-color: #66fcf1;
+    color: #0b0c10;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8em;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+
+  .btn:hover {
+    background-color: #45a29e;
+    color: #ffffff;
+    transform: scale(1.05);
+  }
+
+  #feedback {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 1.2em;
+    min-height: 25px;
+  }
+
+  .correct { color: #66fcf1; }
+  .wrong { color: #ff6b6b; }
+  .hidden { display: none !important; }
+
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <h1>🚀 Missão CQB: O Resgate</h1>
+  <div class="emoji-display" id="cenario-emoji">🤖</div>
+  <div class="story-text" id="historia">
+    Carregando sistema da nave...
+  </div>
+  
+  <div class="input-area" id="area-interativa">
+    <input type="number" id="resposta-jogador" placeholder="Valor?" autocomplete="off">
+    <button class="btn" id="btn-enviar" onclick="verificarResposta()">CONFIRMAR ENERGIA</button>
+  </div>
+  
+  <div id="feedback"></div>
+
+  <button class="btn hidden" id="btn-reiniciar" onclick="iniciarJogo()">JOGAR NOVAMENTE</button>
+</div>
+
+<script>
+  let nivelAtual = 0;
+  let respostaCorreta = 0;
+  let niveis = [];
+
+  // Funções para gerar números aleatórios amigáveis para cálculo mental de 5º ano
+  function gerarNumeroPequeno() {
+    // Sorteia números base entre 70 e 85 (terminados em 0 ou 5 para facilitar o raciocínio)
+    const bases = [70, 72, 75, 80, 85];
+    return bases[Math.floor(Math.random() * bases.length)];
+  }
+
+  function gerarNumeroGrande() {
+    // Sorteia múltiplos de 500 entre 1500 e 10000
+    const min = 3;  // 3 * 500 = 1500
+    const max = 20; // 20 * 500 = 10000
+    const multiplicador = Math.floor(Math.random() * (max - min + 1)) + min;
+    return multiplicador * 500;
+  }
+
+  function prepararNiveis() {
+    const numPequeno1 = gerarNumeroPequeno();
+    const numPequeno2 = gerarNumeroPequeno();
+    const numGrande1 = gerarNumeroGrande();
+    const numGrande2 = gerarNumeroGrande();
+
+    niveis = [
+      {
+        emoji: "🤖",
+        texto: `Bem-vindo, Comandante! Sou a LEIA, sua inteligência artificial. Nossa equipe de exploração (Lucas e João Miguel) ficou presa no planeta de sucata. Para iniciar a decolagem da nossa nave, precisamos do <strong>DOBRO</strong> de <strong>${numPequeno1}</strong> células de energia. Qual valor devo injetar no motor?`,
+        resposta: numPequeno1 * 2
+      },
+      {
+        emoji: "☄️",
+        texto: `Excelente! Estamos no espaço. Mas espere! Uma chuva de meteoros se aproxima. Para que os escudos resistam ao impacto, eles exigem o <strong>TRIPLO</strong> de <strong>${numPequeno2}</strong> megavolts de força. Qual valor eu devo calibrar nos escudos?`,
+        resposta: numPequeno2 * 3
+      },
+      {
+        emoji: "🌌",
+        texto: `Ufa, passamos ilesos! Chegamos à órbita do planeta, mas a gravidade aqui é muito forte. Para conseguirmos pousar em segurança, os propulsores reversos precisam do <strong>DOBRO</strong> de <strong>${numGrande1}</strong> gigajoules. Qual é o total de energia necessária?`,
+        resposta: numGrande1 * 2
+      },
+      {
+        emoji: "🛸",
+        texto: `Pouso perfeito! Encontramos o Koppen e o Gustavo com o resto da equipe! Para ativar a cápsula de teletransporte e trazer todos para a nave, precisamos focar o <strong>TRIPLO</strong> de <strong>${numGrande2}</strong> pontos de energia quântica. Rápido, comandante, qual é o valor final?`,
+        resposta: numGrande2 * 3
+      }
+    ];
+  }
+
+  function iniciarJogo() {
+    prepararNiveis();
+    nivelAtual = 0;
+    
+    document.getElementById("area-interativa").classList.remove("hidden");
+    document.getElementById("btn-reiniciar").classList.add("hidden");
+    document.getElementById("feedback").innerText = "";
+    document.getElementById("resposta-jogador").value = "";
+    
+    carregarNivel();
+  }
+
+  function carregarNivel() {
+    const nivel = niveis[nivelAtual];
+    respostaCorreta = nivel.resposta;
+    
+    document.getElementById("cenario-emoji").innerText = nivel.emoji;
+    document.getElementById("historia").innerHTML = nivel.texto;
+    document.getElementById("resposta-jogador").value = "";
+    document.getElementById("resposta-jogador").focus();
+  }
+
+  function verificarResposta() {
+    const input = document.getElementById("resposta-jogador");
+    const valorDigitado = parseInt(input.value);
+    const feedback = document.getElementById("feedback");
+
+    if (isNaN(valorDigitado)) {
+      feedback.innerText = "⚠️ Por favor, digite um número válido!";
+      feedback.className = "wrong";
+      return;
+    }
+
+    if (valorDigitado === respostaCorreta) {
+      feedback.innerText = "✅ Cálculo perfeito, Comandante!";
+      feedback.className = "correct";
+      
+      nivelAtual++;
+      
+      setTimeout(() => {
+        feedback.innerText = "";
+        if (nivelAtual < niveis.length) {
+          carregarNivel();
+        } else {
+          finalizarJogo();
+        }
+      }, 1500); // Espera 1.5s antes de ir para a próxima tela
+      
+    } else {
+      feedback.innerText = "❌ Falha no sistema! Calcule com cuidado e tente novamente.";
+      feedback.className = "wrong";
+      input.value = "";
+      input.focus();
+    }
+  }
+
+  function finalizarJogo() {
+    document.getElementById("cenario-emoji").innerText = "🏆";
+    document.getElementById("historia").innerHTML = "<strong>Missão Cumprida!</strong><br><br>Graças aos seus excelentes cálculos matemáticos, a LEIA conseguiu calibrar a nave e o Esquadrão CQB inteiro está de volta em segurança!";
+    
+    document.getElementById("area-interativa").classList.add("hidden");
+    document.getElementById("btn-reiniciar").classList.remove("hidden");
+  }
+
+  // Permite apertar "Enter" para enviar a resposta
+  document.getElementById("resposta-jogador").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      verificarResposta();
+    }
+  });
+
+  // Inicia o jogo ao carregar a tela
+  window.onload = iniciarJogo;
+
+</script>
+</body>
+</html>
